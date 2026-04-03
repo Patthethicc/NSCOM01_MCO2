@@ -9,8 +9,8 @@ class SIP:
     def make_start_line_send(method, ip_add):
         return f"{method} sip:{ip_add} SIP/2.0"
     
-    def make_start_line_receive(method, status_code, reason, ip_add):
-        return f"SIP/2.0 {method} {status_code} {reason} sip:{ip_add}"
+    def make_start_line_receive(status_code, reason):
+        return f"SIP/2.0 {status_code} {reason}"
 
     def make_packet(self, start_line, via, to, _from, call_id, cseq, content_type=None, content_length=0, body=""):
         self.packet = SIP_packet(start_line, via, to, _from, call_id, cseq, content_type, content_length, body)
