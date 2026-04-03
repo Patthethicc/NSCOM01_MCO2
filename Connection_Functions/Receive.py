@@ -66,8 +66,7 @@ class Recv_func:
         try:
             start_line = SIP_packet.make_start_line_receive(error_code, error_reason)
 
-            sip = SIP_packet(
-                start_line=start_line, 
+            sip = SIP_packet(start_line=start_line, 
                 via=packet.via,         
                 to=packet.to,           
                 _from=packet._from,     
@@ -75,8 +74,7 @@ class Recv_func:
                 cseq=packet.cseq,       
                 content_type=None,
                 content_length=0,
-                body=""
-            )
+                body="")
             
             sip_string = sip.to_bytes()
 

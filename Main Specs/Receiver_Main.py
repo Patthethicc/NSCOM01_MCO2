@@ -1,23 +1,57 @@
-# Listen on SIP port -> Receive INVITE (PAT)
+import socket
+from Packets import SIP_packet
+from Connection_Functions.Receive import Recv_func
 
-    #place code here
+RECEIVER_IP = ""
+RECEIVER_PORT = 0
+flag = True
 
-# Send 200 OK with Receiver's SDP rules attached (PAT)
+sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)    
+sock.bind((RECEIVER_IP, RECEIVER_PORT))
+#set timeout to 5 seconds
+sock.settimeout(5.0)
 
-    #place code here
+print(f"UDP server listening on {RECEIVER_IP}:{RECEIVER_PORT}\n\n")
 
-# Wait for ACK from Sender (PAT)
+print("Waiting for INVITE...\n\n")
 
-    #place code here
+while flag:
+    try:
+        data, addr = sock.recvfrom(4096)
 
-# Initialize RTP port -> Loop to receive packets, strip headers, and play audio or store then play audio (JERU)
+        receiver = Recv_func(receiver_ip=RECEIVER_IP, receiver_port=RECEIVER_PORT, socket=sock, sender_ip=addr[0], sender_port=addr[1])
 
-    #place code here
+        try:
+            packet = SIP_packet.from_bytes(data)
+        except Exception as e:
+            print(f"Failed to parse incoming packet: {e}")
+            continue
 
-# Receive BYE on SIP port from Sender (PAT) 
+        if packet.start_line.startswith("INVITE"):
+            print(f"Received INVITE from {addr}.\n\n")
+            receiver.recv_invite(packet)
 
-    #place code here
+        elif packet.start_line.startswith("BYE"):
+            print(f"Received BYE from {addr}.\n\n")
+            receiver.recv_bye(packet)
 
-# Send final 200 OK -> Close application (PAT)
+            flag = False
 
-    #place code here
+        elif packet.start_line.startswith("ACK"):
+            print(f"Received ACK from {addr}.\n\n")
+            print("Connection Established... Waiting for next process...\n\n")
+
+            # Initialize RTP port -> Loop to receive packets, strip headers, and play audio or store then play audio (JERU)
+            #place code here
+        
+        else:
+            print(f"Received unexpected packet from {addr}: {packet.start_line}\n\n")
+            receiver.recv_error(packet, "400", "Bad Request")
+
+    except socket.timeout:
+        print(f"Awaiting incoming connections...\n\n")
+        continue
+
+print("Thank you for using the program...\n\n")
+sock.close()
+
