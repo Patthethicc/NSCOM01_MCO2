@@ -21,4 +21,3 @@ class SIP:
     def from_bytes(self, data):
         return SIP_packet.from_bytes(data)
 
-    #def check_packet(self, packet):

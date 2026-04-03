@@ -12,7 +12,7 @@ class SIP_packet:
         self.content_type = content_type
         self.content_length = int(content_length)
         self.body = body
-
+    
     # Builds formatted SIP string for the packet to be sent.
     def to_bytes(self):
         
