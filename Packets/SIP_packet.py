@@ -13,6 +13,14 @@ class SIP_packet:
         self.content_length = int(content_length)
         self.body = body
     
+    @staticmethod
+    def make_start_line_send(method, ip_add):
+        return f"{method} sip:{ip_add} SIP/2.0"
+    
+    @staticmethod
+    def make_start_line_receive(status_code, reason):
+        return f"SIP/2.0 {status_code} {reason}"
+    
     # Builds formatted SIP string for the packet to be sent.
     def to_bytes(self):
         
