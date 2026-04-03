@@ -10,12 +10,11 @@ class SIP_packet:
         self.max_forwards = 70
         
         self.content_type = content_type
-        self.content_length = content_length
+        self.content_length = int(content_length)
         self.body = body
 
     # Builds formatted SIP string for the packet to be sent.
     def to_bytes(self):
-        """Builds the strictly formatted SIP string and encodes it for the socket."""
         
         sip_str = f"{self.start_line}\r\n"
         
@@ -37,3 +36,35 @@ class SIP_packet:
         sip_str += self.body
         
         return sip_str.encode('utf-8')
+    
+    # Builds formatted SIP string for the packet to be sent.
+    @classmethod
+    def from_bytes(cls, packet_bytes):
+        
+        sip_string = packet_bytes.decode('utf-8')
+
+        parts = sip_string.split('\r\n\r\n', 1)
+        headers_block = parts[0]
+        
+        body = parts[1] if len(parts) > 1 else ""
+
+        lines = headers_block.split('\r\n')
+
+        start_line = lines[0]
+
+        parsed_headers = {}
+        for line in lines[1:]:
+            if ":" in line:
+                key, value = line.split(":", 1) 
+                parsed_headers[key.strip()] = value.strip() 
+
+        via = parsed_headers.get("Via", "")
+        to = parsed_headers.get("To", "")
+        _from = parsed_headers.get("From", "")
+        call_id = parsed_headers.get("Call-ID", "")
+        cseq = parsed_headers.get("CSeq", "")
+        content_type = parsed_headers.get("Content-Type")
+        
+        content_length = parsed_headers.get("Content-Length", 0) 
+
+        return cls(start_line, via, to, _from, call_id, cseq, content_type, content_length, body)
