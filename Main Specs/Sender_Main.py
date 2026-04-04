@@ -5,6 +5,8 @@ current_dir = os.path.dirname(os.path.abspath(__file__))
 parent_dir = os.path.dirname(current_dir)
 sys.path.append(parent_dir)
 
+from File_Transfer_Functions.RTP import send_audio_file
+from File_Transfer_Functions.RTCP import send_rtcp_report
 import socket
 from dotenv import load_dotenv
 from Packets.SIP_packet import SIP_packet
@@ -58,8 +60,17 @@ while flag:
     choice = input().upper()
 
     if choice == 'S':
-        #Ask user for file -> Loop through file and blast RTP packets (JERU)
-        pass
+        print("Enter the path to the .wav file:")
+        file_path = input()
+        
+        # In a real app, you'd run RTCP in a separate thread. 
+        # For this MP, we can send one report after the stream.
+        seq, ts = send_audio_file(file_path, SENDER_IP, SENDER_PORT, RECEIVER_IP, RECEIVER_PORT, sock)
+        
+        # Send an RTCP report upon completion (as per specs) [cite: 81]
+        send_rtcp_report(sock, RECEIVER_IP, RECEIVER_PORT, ssrc=12345, 
+                         timestamp=ts, packet_count=seq, octet_count=seq*160)
+        
     elif choice == 'B':
         sender.send_bye(packet)
 
