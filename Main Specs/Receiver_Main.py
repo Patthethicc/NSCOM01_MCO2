@@ -1,5 +1,5 @@
 import socket
-from Packets import SIP_packet
+from Packets.SIP_packet import SIP_packet
 from Connection_Functions.Receive import Recv_func
 
 RECEIVER_IP = ""
