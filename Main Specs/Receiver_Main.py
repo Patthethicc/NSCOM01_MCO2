@@ -6,11 +6,14 @@ parent_dir = os.path.dirname(current_dir)
 sys.path.append(parent_dir)
 
 import socket
+from dotenv import load_dotenv
 from Packets.SIP_packet import SIP_packet
 from Connection_Functions.Receive import Recv_func
 
-RECEIVER_IP = ""
-RECEIVER_PORT = 0
+load_dotenv()
+
+RECEIVER_IP = os.getenv("RECEIVER_IP")
+RECEIVER_PORT = int(os.getenv("RECEIVER_PORT"))
 flag = True
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)    
