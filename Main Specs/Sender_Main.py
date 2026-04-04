@@ -6,11 +6,16 @@ parent_dir = os.path.dirname(current_dir)
 sys.path.append(parent_dir)
 
 import socket
+from dotenv import load_dotenv
 from Packets.SIP_packet import SIP_packet
 from Connection_Functions.Send import Send_func
 
-SENDER_IP = ""
-SENDER_PORT = 0
+load_dotenv()
+
+SENDER_IP = os.getenv("SENDER_IP")
+SENDER_PORT = int(os.getenv("SENDER_PORT"))
+RECEIVER_IP = os.getenv("RECEIVER_IP")
+RECEIVER_PORT = int(os.getenv("RECEIVER_PORT"))
 flag = True
     
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)    
@@ -21,7 +26,7 @@ sock.settimeout(5.0)
 print(f"UDP server listening on {SENDER_IP}:{SENDER_PORT}\n\n")
 
 #Add the address and port of the receiver over here!
-sender = Send_func(sender_ip=SENDER_IP, sender_port=SENDER_PORT, receiver_ip="", receiver_port=0, socket=sock)
+sender = Send_func(sender_ip=SENDER_IP, sender_port=SENDER_PORT, receiver_ip=RECEIVER_IP, receiver_port=RECEIVER_PORT, socket=sock)
 
 while flag:
     print("Press Enter to send an INVITE...")
