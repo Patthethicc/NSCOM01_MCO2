@@ -18,8 +18,6 @@ flag = True
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)    
 sock.bind((RECEIVER_IP, RECEIVER_PORT))
-#set timeout to 5 seconds
-sock.settimeout(5.0)
 
 print(f"UDP server listening on {RECEIVER_IP}:{RECEIVER_PORT}\n\n")
 
