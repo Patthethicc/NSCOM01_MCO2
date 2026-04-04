@@ -61,7 +61,7 @@ while flag:
         #Ask user for file -> Loop through file and blast RTP packets (JERU)
         pass
     elif choice == 'B':
-        sender.send_bye()
+        sender.send_bye(packet)
 
         print(f"\n\nEnding connection with {sender.receiver_ip}:{sender.receiver_port}...\n\n")
 
