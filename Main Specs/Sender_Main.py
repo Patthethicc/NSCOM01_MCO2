@@ -1,3 +1,10 @@
+import sys
+import os
+
+current_dir = os.path.dirname(os.path.abspath(__file__))
+parent_dir = os.path.dirname(current_dir)
+sys.path.append(parent_dir)
+
 import socket
 from Packets.SIP_packet import SIP_packet
 from Connection_Functions.Send import Send_func
