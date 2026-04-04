@@ -18,12 +18,15 @@ flag = True
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)    
 sock.bind((RECEIVER_IP, RECEIVER_PORT))
+#set timeout to 5 seconds
+sock.settimeout(5.0)
 
 print(f"UDP server listening on {RECEIVER_IP}:{RECEIVER_PORT}\n\n")
 
 print("Waiting for INVITE...\n\n")
 
 while flag:
+    try:
         data, addr = sock.recvfrom(4096)
 
         receiver = Recv_func(receiver_ip=RECEIVER_IP, receiver_port=RECEIVER_PORT, socket=sock, sender_ip=addr[0], sender_port=addr[1])
@@ -54,6 +57,10 @@ while flag:
         else:
             print(f"Received unexpected packet from {addr}: {packet.start_line}\n\n")
             receiver.recv_error(packet, "400", "Bad Request")
+
+    except socket.timeout:
+        print(f"Awaiting incoming connections...\n\n")
+        continue
 
 print("Thank you for using the program...\n\n")
 sock.close()
