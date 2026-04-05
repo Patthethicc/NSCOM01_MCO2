@@ -1,55 +1,52 @@
 import time
 import wave
+import audioop # Built-in Python library for basic audio manipulation
 from Packets.RTP_packet import RTPPacket
 
 def send_audio_file(filename, sender_ip, sender_port, receiver_ip, receiver_port, sock, ssrc=12345):
-    """
-    Reads a .wav file and sends it as a stream of RTP packets.
-    """
+    filename = filename.strip('"').strip("'")
+    target_rate = 8000 # The rate your Receiver_Main is expecting
+
     try:
         with wave.open(filename, 'rb') as wav:
-            # SIP typically uses 20ms chunks for audio
-            # G.711 (PCMU) at 8000Hz = 160 samples per 20ms
+            original_rate = wav.getframerate()
             n_channels = wav.getnchannels()
             sample_width = wav.getsampwidth()
-            framerate = wav.getframerate()
             
-            # Simplified: Read 160 frames at a time
-            chunk_size = 160 
+            print(f"Original Rate: {original_rate}Hz | Target Rate: {target_rate}Hz")
+            
+            # Read the entire file content
+            raw_data = wav.readframes(wav.getnframes())
+
+            # 1. Convert Stereo to Mono if necessary
+            if n_channels > 1:
+                raw_data = audioop.tomono(raw_data, sample_width, 1, 1)
+
+            # 2. Resample to 8000Hz
+            # state is None for the first call to ratecv
+            resampled_data, _ = audioop.ratecv(raw_data, sample_width, 1, original_rate, target_rate, None)
+
+            # 3. Packetize the resampled data (160 frames = 320 bytes for 16-bit PCM)
+            chunk_size = 320 
             sequence_number = 0
             timestamp = 0
-            
-            print(f"Starting RTP stream: {filename} to {receiver_ip}:{receiver_port}")
-            
-            while True:
-                data = wav.readframes(chunk_size)
-                if not data:
-                    break
+
+            for i in range(0, len(resampled_data), chunk_size):
+                data_chunk = resampled_data[i:i + chunk_size]
                 
-                # Create the RTP Packet
-                # Payload Type 0 is usually PCMU (G.711)
-                rtp_pkt = RTPPacket(
-                    payload_type=0, 
-                    sequence_number=sequence_number,
-                    timestamp=timestamp,
-                    ssrc=ssrc,
-                    payload=data
-                )
-                
-                # Send via the existing socket
+                # Ensure the last chunk is padded if it's too small
+                if len(data_chunk) < chunk_size:
+                    data_chunk = data_chunk.ljust(chunk_size, b'\x00')
+
+                rtp_pkt = RTPPacket(0, sequence_number, timestamp, ssrc, data_chunk)
                 sock.sendto(rtp_pkt.to_bytes(), (receiver_ip, receiver_port))
                 
-                # Update headers
                 sequence_number = (sequence_number + 1) % 65536
-                timestamp += chunk_size
-                
-                # Real-time pacing: 20ms delay
-                time.sleep(0.02)
-                
-            print("Audio stream finished.")
+                timestamp += 160 # Increase by number of samples per packet
+                time.sleep(0.02) # 20ms delay for real-time pacing
+
             return sequence_number, timestamp
-            
-    except FileNotFoundError:
-        print(f"Error: File {filename} not found.")
+
     except Exception as e:
-        print(f"RTP Error: {e}") 
+        print(f"RTP Resampling Error: {e}")
+        return 0, 0

@@ -22,12 +22,12 @@ flag = True
     
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)    
 sock.bind((SENDER_IP, SENDER_PORT))
-#set timeout to 5 seconds
+
 sock.settimeout(5.0)
 
 print(f"UDP server listening on {SENDER_IP}:{SENDER_PORT}\n\n")
 
-#Add the address and port of the receiver over here!
+
 sender = Send_func(sender_ip=SENDER_IP, sender_port=SENDER_PORT, receiver_ip=RECEIVER_IP, receiver_port=RECEIVER_PORT, socket=sock)
 
 while flag:
@@ -63,11 +63,10 @@ while flag:
         print("Enter the path to the .wav file:")
         file_path = input()
         
-        # In a real app, you'd run RTCP in a separate thread. 
-        # For this MP, we can send one report after the stream.
+        
         seq, ts = send_audio_file(file_path, SENDER_IP, SENDER_PORT, RECEIVER_IP, RECEIVER_PORT, sock)
         
-        # Send an RTCP report upon completion (as per specs) [cite: 81]
+        
         send_rtcp_report(sock, RECEIVER_IP, RECEIVER_PORT, ssrc=12345, 
                          timestamp=ts, packet_count=seq, octet_count=seq*160)
         
