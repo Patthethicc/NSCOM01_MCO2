@@ -1,7 +1,7 @@
 # NSCOM01_MCO2
 **Real-Time Communication Project**
 by Jeruel Fabricante & Patrick Perez
-NSCOM01 - Dr. Marnel Peradilla
+NSCOM01_S01 - Dr. Marnel Peradilla
 
 ## Instructions for Compiling and Running the Program
 
