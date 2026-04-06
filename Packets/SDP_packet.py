@@ -1,5 +1,6 @@
-#packet class for SDP
+# Class for SDP Packet
 class SDP_packet:
+    # Initializes the class
     def __init__(self, origin, connection_data, media, attribute):
         self.version = 0
         self.origin = origin
@@ -9,7 +10,7 @@ class SDP_packet:
         self.media = media
         self.attribute = attribute
 
-    #Converts to string
+    # Converts to string for the SIP packet
     def to_string(self):
         sdp_str = f"v={self.version}\r\n"
         sdp_str += f"o={self.origin}\r\n"

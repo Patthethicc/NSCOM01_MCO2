@@ -1,5 +1,6 @@
-#packet class for SIP
+# Class for SIP Packet
 class SIP_packet:
+    # Initializes the class
     def __init__(self, start_line, via, to, _from, call_id, cseq, content_type=None, content_length=0, body=""):
         self.start_line = start_line
         self.via = via
@@ -13,15 +14,17 @@ class SIP_packet:
         self.content_length = int(content_length)
         self.body = body
     
+    # Creates a start line string for sending packets, based on the method and receiver IP
     @staticmethod
     def make_start_line_send(method, ip_add):
         return f"{method} sip:{ip_add} SIP/2.0"
     
+    # Creates a start line string for receiving packets, based on the status code and reason
     @staticmethod
     def make_start_line_receive(status_code, reason):
         return f"SIP/2.0 {status_code} {reason}"
     
-    # Builds formatted SIP string for the packet to be sent.
+    # Converts the packet into bytes for sending
     def to_bytes(self):
         
         sip_str = f"{self.start_line}\r\n"
@@ -45,7 +48,7 @@ class SIP_packet:
         
         return sip_str.encode('utf-8')
     
-    # Builds formatted SIP string for the packet to be sent.
+    # Converts the bytes into a packet object after receiving
     @classmethod
     def from_bytes(cls, packet_bytes):
         

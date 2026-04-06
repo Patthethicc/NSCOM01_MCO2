@@ -85,9 +85,9 @@ class Send_func:
 
             self.socket.sendto(sip_string, (self.receiver_ip, self.receiver_port))
 
-            print(f"BYE successfully sent to {self.receiver_ip}:{self.receiver_port}")
+            print(f"\nBYE successfully sent to {self.receiver_ip}:{self.receiver_port}")
 
             return True
         except Exception as e:
-            print(f"Error sending BYE: {e}")
+            print(f"\nError sending BYE: {e}")
             return False

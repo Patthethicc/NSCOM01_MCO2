@@ -1,6 +1,8 @@
 import struct
 
+# Class for RTP Packet
 class RTPPacket:
+    # Initializes the class
     def __init__(self, payload_type, sequence_number, timestamp, ssrc, payload):
         self.version = 2
         self.padding = 0
@@ -14,6 +16,7 @@ class RTPPacket:
         self.ssrc = ssrc
         self.payload = payload
 
+    # Converts the packet into bytes for sending
     def to_bytes(self):
         #turn into binary bytes for sending
         byte1 = (self.version << 6) | (self.padding << 5) | (self.extension << 4) | self.cc
@@ -21,6 +24,7 @@ class RTPPacket:
         header = struct.pack('!BBHII', byte1, byte2, self.sequence_number, self.timestamp, self.ssrc)
         return header + self.payload
 
+    # Converts the bytes into a packet object after receiving
     @classmethod
     def from_bytes(cls, packet_bytes):
         #turn binary into object after sending
