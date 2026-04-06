@@ -41,5 +41,24 @@
 
 3. Press I on either terminal to call the other user.
 
+**Note: Press ENTER after connecting to start the microphone for each side**
+
 ## Description of the Implemented Features
+
+### **Packets**
+ - **SIP Packets:** Custom string-based packet generation parsing text-based headers for standard SIP methods (INVITE, 200 OK, ACK, BYE).
+ - **RTP Packets:** Binary packing and unpacking using the struct module. Extracts a 12-byte header containing Payload Type, Sequence Numbers (to prevent UDP out-of-order distortion), and Timestamps.
+ - **RTCP Packets:** Sender Report generation to track packet counts and octet counts for session statistics.
+
+### **Sender**
+- Manages outgoing SIP requests and waits for specific responses. 
+- Uses libraries to automatically read .wav files selected by the user which is then sent to the receiver.
+
+### **Receiver**
+- Receives SIP packets and sends specific startlines for the sender to acknowledge.
+- Plays audio once all RTP packets are sent and received.
+
+### **Bonus**
+- Two-way communication along with real time microphone communication is implemented.
+
 ## Test Cases and Sample Outputs
