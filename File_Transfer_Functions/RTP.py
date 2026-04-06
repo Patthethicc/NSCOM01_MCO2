@@ -3,17 +3,19 @@ import wave
 import audioop # Built-in Python library for basic audio manipulation
 from Packets.RTP_packet import RTPPacket
 
+# Function to send an audio file as RTP packets
 def send_audio_file(filename, sender_ip, sender_port, receiver_ip, receiver_port, sock, ssrc=12345):
     filename = filename.strip('"').strip("'")
     target_rate = 8000 # The rate your Receiver_Main is expecting
 
     try:
+        # Opens the .wav file and resamples it to the target rate
         with wave.open(filename, 'rb') as wav:
             original_rate = wav.getframerate()
             n_channels = wav.getnchannels()
             sample_width = wav.getsampwidth()
             
-            print(f"Original Rate: {original_rate}Hz | Target Rate: {target_rate}Hz")
+            print(f"\nOriginal Rate: {original_rate}Hz | Target Rate: {target_rate}Hz")
             
    
             raw_data = wav.readframes(wav.getnframes())
@@ -28,10 +30,12 @@ def send_audio_file(filename, sender_ip, sender_port, receiver_ip, receiver_port
 
             print(f"DEBUG: Resampled data length: {len(resampled_data)} bytes")
             
+            # Configures RTP packet parameters
             chunk_size = 320 
             sequence_number = 0
             timestamp = 0
 
+            # Send RTP packets in chunks
             for i in range(0, len(resampled_data), chunk_size):
                 data_chunk = resampled_data[i:i + chunk_size]
                 
