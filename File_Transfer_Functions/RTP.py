@@ -20,7 +20,7 @@ def send_audio_file(filename, sender_ip, sender_port, receiver_ip, receiver_port
 
             # 1. Convert Stereo to Mono if necessary
             if n_channels > 1:
-                raw_data = audioop.tomono(raw_data, sample_width, 1, 1)
+                raw_data = audioop.tomono(raw_data, sample_width, 0.5, 0.5)
 
             # 2. Resample to 8000Hz
             # state is None for the first call to ratecv

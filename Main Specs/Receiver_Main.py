@@ -19,7 +19,7 @@ RECEIVER_IP = os.getenv("RECEIVER_IP")
 RECEIVER_PORT = int(os.getenv("RECEIVER_PORT"))
 flag = True
 
-received_audio_payloads = []
+received_audio_payloads = {}
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)    
 sock.bind((RECEIVER_IP, RECEIVER_PORT))
@@ -61,7 +61,7 @@ while flag:
            
             try:
                 rtp_pkt = RTPPacket.from_bytes(data)
-                received_audio_payloads.append(rtp_pkt.payload)
+                received_audio_payloads[rtp_pkt.sequence_number] = rtp_pkt.payload
                 
                 if rtp_pkt.sequence_number % 50 == 0:
                     print(f"Receiving RTP... Seq: {rtp_pkt.sequence_number}")
@@ -78,12 +78,14 @@ if received_audio_payloads:
     output_file = "received_audio.wav"
     print(f"\nSaving received audio to {output_file}...")
     try:
+        sorted_payloads = [received_audio_payloads[seq] for seq in sorted(received_audio_payloads.keys())]
+
         with wave.open(output_file, 'wb') as wav_file:
             
             wav_file.setnchannels(1)
             wav_file.setsampwidth(2) 
             wav_file.setframerate(8000)
-            wav_file.writeframes(b''.join(received_audio_payloads))
+            wav_file.writeframes(b''.join(sorted_payloads))
         
         print("File saved successfully!")
         
