@@ -15,18 +15,19 @@ def send_audio_file(filename, sender_ip, sender_port, receiver_ip, receiver_port
             
             print(f"Original Rate: {original_rate}Hz | Target Rate: {target_rate}Hz")
             
-            # Read the entire file content
+   
             raw_data = wav.readframes(wav.getnframes())
 
-            # 1. Convert Stereo to Mono if necessary
+ 
             if n_channels > 1:
                 raw_data = audioop.tomono(raw_data, sample_width, 0.5, 0.5)
 
-            # 2. Resample to 8000Hz
-            # state is None for the first call to ratecv
+
+            
             resampled_data, _ = audioop.ratecv(raw_data, sample_width, 1, original_rate, target_rate, None)
 
-            # 3. Packetize the resampled data (160 frames = 320 bytes for 16-bit PCM)
+            print(f"DEBUG: Resampled data length: {len(resampled_data)} bytes")
+            
             chunk_size = 320 
             sequence_number = 0
             timestamp = 0
@@ -34,7 +35,7 @@ def send_audio_file(filename, sender_ip, sender_port, receiver_ip, receiver_port
             for i in range(0, len(resampled_data), chunk_size):
                 data_chunk = resampled_data[i:i + chunk_size]
                 
-                # Ensure the last chunk is padded if it's too small
+                
                 if len(data_chunk) < chunk_size:
                     data_chunk = data_chunk.ljust(chunk_size, b'\x00')
 
@@ -42,8 +43,8 @@ def send_audio_file(filename, sender_ip, sender_port, receiver_ip, receiver_port
                 sock.sendto(rtp_pkt.to_bytes(), (receiver_ip, receiver_port))
                 
                 sequence_number = (sequence_number + 1) % 65536
-                timestamp += 160 # Increase by number of samples per packet
-                time.sleep(0.02) # 20ms delay for real-time pacing
+                timestamp += 160
+                time.sleep(0.02)
 
             return sequence_number, timestamp
 
